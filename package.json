@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
-    "postinstall": "tailwindcss -i ./src/index.css -o ./dist/output.css --watch"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.1",
