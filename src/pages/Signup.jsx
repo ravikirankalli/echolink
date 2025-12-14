@@ -16,61 +16,54 @@ export default function Signup() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      alert("Account created successfully!");
-      navigate("/"); // redirect to home after signup
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-blue-100 to-yellow-100 px-4">
       <form
         onSubmit={handleSignup}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
+        className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-md border border-white/40"
       >
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Create an Account
+        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
+          Create Account 🚀
         </h2>
 
         {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">
+          <p className="text-red-500 text-sm text-center mb-4">
             {error}
           </p>
         )}
 
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium">Email</label>
-          <input
-            type="email"
-            name="email"
-            required
-            placeholder="Enter your email"
-            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          required
+          className="w-full border border-gray-300 p-3 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
 
-        <div className="mb-6">
-          <label className="block mb-1 text-sm font-medium">Password</label>
-          <input
-            type="password"
-            name="password"
-            required
-            placeholder="Create a password"
-            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+          className="w-full border border-gray-300 p-3 rounded mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
 
-        <button
-          type="submit"
-          className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
-        >
+        <button className="w-full bg-gradient-to-r from-purple-600 via-blue-500 to-yellow-400 text-white py-3 rounded-full font-semibold shadow hover:opacity-90 transition">
           Sign Up
         </button>
 
-        <p className="text-sm text-center mt-4">
+        <p className="text-sm text-center mt-5 text-gray-700">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
+          <Link
+            to="/login"
+            className="font-semibold bg-gradient-to-r from-purple-600 via-blue-500 to-yellow-400 bg-clip-text text-transparent"
+          >
             Login
           </Link>
         </p>

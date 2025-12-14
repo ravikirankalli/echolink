@@ -9,104 +9,74 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!title || !content || !image) {
-      alert("Please fill all fields");
-      return;
-    }
+    if (!title || !content || !image) return alert("All fields required");
 
     setLoading(true);
 
-    try {
-      // 1️⃣ Upload image to Supabase Storage
-      const fileExt = image.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
+    const fileName = `${Date.now()}-${image.name}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("blog-images")
-        .upload(fileName, image, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+    const { error: uploadError } = await supabase.storage
+      .from("blog-images")
+      .upload(fileName, image);
 
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        alert("Image upload failed");
-        return;
-      }
-
-      // 2️⃣ Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from("blog-images")
-        .getPublicUrl(fileName);
-
-      const imageUrl = publicUrlData.publicUrl;
-
-      // 3️⃣ Insert blog into database
-      const { error: insertError } = await supabase
-        .from("blogs")
-        .insert([
-          {
-            title,
-            content,
-            image_url: imageUrl,
-          },
-        ]);
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        alert("Failed to create blog post");
-        return;
-      }
-
-      alert("Blog created successfully!");
-      setTitle("");
-      setContent("");
-      setImage(null);
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("Something went wrong");
-    } finally {
+    if (uploadError) {
       setLoading(false);
+      return alert("Image upload failed");
     }
+
+    const { data } = supabase.storage
+      .from("blog-images")
+      .getPublicUrl(fileName);
+
+    await supabase.from("blogs").insert([
+      { title, content, image_url: data.publicUrl },
+    ]);
+
+    alert("Blog published 🎉");
+    setTitle("");
+    setContent("");
+    setImage(null);
+    setLoading(false);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-6 max-w-xl mx-auto space-y-4 bg-white shadow rounded"
-    >
-      <h2 className="text-2xl font-bold text-center">
-        Create New Blog Post
-      </h2>
-
-      <input
-        className="border p-2 w-full rounded"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      <textarea
-        className="border p-2 w-full rounded"
-        placeholder="Content"
-        rows="6"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setImage(e.target.files[0])}
-      />
-
-      <button
-        disabled={loading}
-        className="bg-black text-white px-4 py-2 w-full rounded hover:bg-gray-800 disabled:opacity-50"
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-blue-100 to-yellow-100 p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-2xl space-y-4 border border-white/40"
       >
-        {loading ? "Publishing..." : "Publish"}
-      </button>
-    </form>
+        <h2 className="text-3xl font-extrabold text-center text-gray-800">
+          Write a Blog ✨
+        </h2>
+
+        <input
+          placeholder="Blog Title"
+          className="w-full border border-gray-300 p-3 rounded focus:ring-2 focus:ring-purple-500"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Write your content..."
+          rows="6"
+          className="w-full border border-gray-300 p-3 rounded focus:ring-2 focus:ring-blue-500"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
+
+        <input
+          type="file"
+          className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-gradient-to-r file:from-purple-600 file:via-blue-500 file:to-yellow-400 file:text-white cursor-pointer"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
+
+        <button
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-purple-600 via-blue-500 to-yellow-400 text-white py-3 rounded-full font-semibold shadow hover:opacity-90 transition disabled:opacity-50"
+        >
+          {loading ? "Publishing..." : "Publish"}
+        </button>
+      </form>
+    </div>
   );
 }
